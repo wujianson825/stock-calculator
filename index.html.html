@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>严重异动计算器</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9fafb; }
+    h2 { background: #2563eb; color: white; padding: 8px; border-radius: 6px; }
+    .block { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px;
+             box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+    label { display: block; margin-top: 10px; }
+    input { padding: 5px; margin-top: 3px; width: 200px; }
+    button { margin-top: 12px; padding: 8px 16px; border: none; border-radius: 6px;
+             background: #2563eb; color: white; cursor: pointer; }
+    button:hover { background: #1e40af; }
+    .result { margin-top: 12px; font-weight: bold; color: #111827; }
+    .note { font-size: 12px; color: #6b7280; margin-top: 2px; opacity: 0.8; }
+    .formula { font-family: monospace; background: #f3f4f6; padding: 6px; border-radius: 4px; display: inline-block; }
+  </style>
+</head>
+<body>
+
+<h1>严重异动计算器</h1>
+
+<!-- 板块一 -->
+<div class="block">
+  <h2>板块一：累计偏离值计算</h2>
+  <div class="formula">任意区间累计偏离值 = 任意区间终止价 ÷ 任意区间起始价 − 1 − 任意区间大盘涨跌</div><br>
+  <div class="formula">10厘米第h天涨停价 = 10厘米现价 × 1.1^天数</div><br>
+  <div class="formula">20厘米第s天涨停价 = 20厘米现价 × 1.2^天数</div>
+
+  <label>任意区间起始价 a <input id="a" type="number"></label>
+  <label>任意区间终止价 b <input id="b" type="number"></label>
+  <label>任意区间大盘涨跌 c (%) <input id="c" type="number"></label>
+  <label>10厘米天数 h <input id="h" type="number"></label>
+  <label>20厘米天数 s <input id="s" type="number"></label>
+  <label>10厘米现价 g <input id="g" type="number"></label>
+  <label>20厘米现价 n <input id="n" type="number"></label>
+
+  <button onclick="calcBlock1()">计算</button>
+  <div class="result" id="res1"></div>
+</div>
+
+<!-- 板块二 -->
+<div class="block">
+  <h2>板块二：10天严重异动计算</h2>
+  <div class="formula">10天累计偏离值 = 10天终止价 ÷ 10天起始价 − 1 − 10天对应指数涨跌</div><br>
+  <div class="formula">10天预测严重异动价 = 10天起始价 × (2 + 对应指数涨跌)</div><br>
+  <div class="formula">10天预测严重异动剩余涨幅 = 预测严重异动价 ÷ 终止价 − 1</div>
+
+  <label>10天起始价 a1 <input id="a1" type="number"></label>
+  <label>10天终止价 b1 <input id="b1" type="number"></label>
+  <label>10天对应指数涨跌 c1 (%) <input id="c1" type="number"></label>
+
+  <button onclick="calcBlock2()">计算</button>
+  <div class="result" id="res2"></div>
+</div>
+
+<!-- 板块三 -->
+<div class="block">
+  <h2>板块三：30天严重异动计算</h2>
+  <div class="formula">30天预测严重异动价 = 起始价 × (3 + 对应指数涨跌)</div><br>
+  <div class="formula">30天预测严重异动剩余涨幅 = 预测严重异动价 ÷ 终止价 − 1</div><br>
+  <div class="formula">30天累计偏离值 = 终止价 ÷ 起始价 − 1 − 对应指数涨跌</div>
+
+  <label>30天起始价 l <input id="l" type="number"></label>
+  <label>30天终止价 v <input id="v" type="number"></label>
+  <label>30天对应指数涨跌 p (%) <input id="p" type="number"></label>
+
+  <button onclick="calcBlock3()">计算</button>
+  <div class="result" id="res3"></div>
+</div>
+
+<script>
+  // 板块一
+  function calcBlock1() {
+    const a = parseFloat(document.getElementById("a").value);
+    const b = parseFloat(document.getElementById("b").value);
+    const c = parseFloat(document.getElementById("c").value) / 100;
+    const h = parseFloat(document.getElementById("h").value);
+    const s = parseFloat(document.getElementById("s").value);
+    const g = parseFloat(document.getElementById("g").value);
+    const n = parseFloat(document.getElementById("n").value);
+
+    const out = [];
+
+    if (!isNaN(a) && !isNaN(b) && !isNaN(c)) {
+      const d = b / a - 1 - c;
+      out.push("任意区间累计偏离值 = " + (d * 100).toFixed(2) + "%");
+    }
+    if (!isNaN(g) && !isNaN(h)) {
+      const z = g * Math.pow(1.1, h);
+      out.push("10厘米第h天涨停价 = " + z.toFixed(2));
+    }
+    if (!isNaN(n) && !isNaN(s)) {
+      const m = n * Math.pow(1.2, s);
+      out.push("20厘米第s天涨停价 = " + m.toFixed(2));
+    }
+
+    document.getElementById("res1").innerHTML =
+      out.length ? out.join("<br>") : "请至少填写一条公式所需的输入项";
+  }
+
+  // 板块二
+  function calcBlock2() {
+    const a1 = parseFloat(document.getElementById("a1").value);
+    const b1 = parseFloat(document.getElementById("b1").value);
+    const c1 = parseFloat(document.getElementById("c1").value) / 100;
+
+    if ([a1, b1, c1].some(isNaN)) {
+      document.getElementById("res2").innerText = "请输入完整数值";
+      return;
+    }
+
+    const d1 = b1 / a1 - 1 - c1;
+    const e = a1 * (2 + c1);
+    const f = e / b1 - 1;
+
+    document.getElementById("res2").innerHTML =
+      "10天累计偏离值 = " + (d1 * 100).toFixed(2) + "%<br>" +
+      "10天预测严重异动价 = " + e.toFixed(2) + "<br>" +
+      "10天预测严重异动剩余涨幅 = " + (f * 100).toFixed(2) + "%";
+  }
+
+  // 板块三
+  function calcBlock3() {
+    const l = parseFloat(document.getElementById("l").value);
+    const v = parseFloat(document.getElementById("v").value);
+    const p = parseFloat(document.getElementById("p").value) / 100;
+
+    if ([l, v, p].some(isNaN)) {
+      document.getElementById("res3").innerText = "请输入完整数值";
+      return;
+    }
+
+    const t = l * (3 + p);
+    const y = t / v - 1;
+    const x = v / l - 1 - p;
+
+    document.getElementById("res3").innerHTML =
+      "30天预测严重异动价 = " + t.toFixed(2) + "<br>" +
+      "30天预测严重异动剩余涨幅 = " + (y * 100).toFixed(2) + "%<br>" +
+      "30天累计偏离值 = " + (x * 100).toFixed(2) + "%";
+  }
+</script>
+
+</body>
+</html>
